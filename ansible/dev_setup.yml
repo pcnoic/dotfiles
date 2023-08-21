@@ -104,6 +104,57 @@
         state: link
       become: no
 
+    - name: Get the user shell
+      shell: |
+        set -o pipefail
+        egrep "^{{ lookup('env', 'USER') }}:" /etc/passwd | awk -F: '{ print $7 }' | awk -F/ '{print $3}'
+      args:
+        executable: /bin/bash
+      changed_when: false
+      register: user_shell
+      become: no
+
+    - name: Add homebrew path to system-wide $PATH for bash shell (Debian OS Family).
+      ansible.builtin.lineinfile:
+        path: "/home/{{ lookup('env', 'USER') }}/.profile"
+        line: "PATH=$PATH:~/.linuxbrew/bin"
+        owner: "{{ lookup('env', 'USER') }}"
+        mode: 0644
+        create: yes
+      when: 
+        - user_shell.stdout == "bash" and ansible_os_family == "Debian"
+      become: no
+
+    - name: Add homebrew path to system-wide $PATH for bash shell (RedHat OS Family).
+      ansible.builtin.lineinfile:
+        path: "/home/{{ lookup('env', 'USER') }}/.bash_profile"
+        line: "PATH=$PATH:~/.linuxbrew/bin"
+        owner: "{{ lookup('env', 'USER') }}"
+        mode: 0644
+        create: yes
+      when: 
+        - user_shell.stdout == "bash" and ansible_os_family == "RedHat"
+      become: no
+
+    - name: Add homebrew path to system-wide $PATH for fish shell.
+      ansible.builtin.copy:
+        dest: "/home/{{ lookup('env', 'USER') }}/.config/fish/conf.d/brew.fish"
+        content: "set -gx PATH $PATH /home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
+        owner: "{{ lookup('env', 'USER') }}"
+        mode: 0644
+      when: user_shell.stdout == "fish"
+      become: no
+
+    - name: Add homebrew path to system-wide $PATH for zsh shell.
+      ansible.builtin.lineinfile:
+        path: "/home/{{ lookup('env', 'USER') }}/.zprofile"
+        line: "PATH=$PATH:~/.linuxbrew/bin"
+        owner: "{{ lookup('env', 'USER') }}"
+        mode: 0644
+        create: yes
+      when: user_shell.stdout == "zsh"
+      become: no
+
     - name: Install nvm
       community.general.homebrew:
         name: nvm
