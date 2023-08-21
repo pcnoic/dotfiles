@@ -2,16 +2,6 @@
 - hosts: localhost
   become: yes  # to run tasks as sudo
   tasks:
-    - name: Install AWS CLI
-      apt:
-        name: awscli
-        state: present
-
-    - name: Install fzf
-      apt:
-        name: fzf
-        state: present
-
     - block:
       - name: Install the 'Development tools' package group
         ansible.builtin.yum:
@@ -134,11 +124,61 @@
       community.general.homebrew:
         name: nvm
         state: present
+      become: no
 
     - name: Install tfenv
       community.general.homebrew:
         name: tfenv
         state: present
+      become: no
+
+    - name: Install pyenv
+      community.general.homebrew:
+        name: pyenv
+        state: present
+      become: no
+
+    - name: Install fzf
+      community.general.homebrew:
+        name: fzf
+        state: present
+      become: no
+
+    - name: Install awscli
+      community.general.homebrew:
+        name: awscli
+        state: present
+      become: no
+
+    - name: Install kubectl
+      community.general.homebrew:
+        name: kubectl
+        state: present
+      become: no
+
+    - name: Install kubectx
+      community.general.homebrew:
+        name: kubectx
+        state: present
+      become: no
+
+    - name: Install kubens
+      community.general.homebrew:
+        name: kubens
+        state: present
+      become: no
+
+    - name: Install k9s
+      community.general.homebrew:
+        name: k9s
+        state: present
+      become: no
+
+    - name: Install ipython
+      community.general.homebrew:
+        name: ipython
+        state: present
+      become: no
 
     - name: Install oh-my-bash
       shell: |
@@ -146,8 +186,14 @@
       args:
         warn: no  # This suppresses warnings about using shell instead of a module
       become: no
+      when: 
+        - user_shell.stdout == "bash" and ansible_os_family == "Debian"
 
-    - name: Install ipython
-      apt:
-        name: ipython3
-        state: present
+    - name: Install oh-my-zsh
+      shell: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+      args:
+        warn: no  # This suppresses warnings about using shell instead of a module
+      become: no
+      when: 
+        - user_shell.stdout == "zsh" and ansible_os_family == "Darwin"
