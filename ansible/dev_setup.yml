@@ -37,68 +37,94 @@
         name: fzf
         state: present
 
-    - name: Make sure Homebrew directories exists
-      file: 
-        path: /usr/local/*
+    - block:
+      - name: Install the 'Development tools' package group
+        ansible.builtin.yum:
+          name: "@Development tools"
+          state: present
+  
+      - name: Install prereq rpm packages
+        ansible.builtin.yum:
+          name: "{{ packages }}"
+          state: present
+        vars:
+          packages:
+            - curl
+            - file
+            - git
+            - procps-ng
+
+      - name: Install Fedora 30+ rpm package
+        ansible.builtin.yum:
+          name: libxcrypt-compat
+          state: present
+        when:
+          - ansible_distribution == "Fedora"
+          - ansible_distribution_major_version >= "30"
+    when:
+      - (ansible_pkg_mgr == "yum" or ansible_pkg_mgr == "dnf") and (ansible_os_family == "RedHat" or ansible_os_family == "Rocky")
+
+    - block:  
+      - name: Install prereq deb packages
+        ansible.builtin.apt:
+          update_cache: true
+          name: "{{ packages }}"
+          state: present
+        vars:
+          packages:
+            - build-essential
+            - curl
+            - file
+            - git
+            - procps
+    when:
+      - ansible_pkg_mgr == "apt" and ansible_os_family == "Debian"
+
+    - name: Clone Homebrew GitHub repo
+      ansible.builtin.git:
+        repo: https://github.com/Homebrew/brew.git
+        dest: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew"
+        version: master
+      become_user: "{{ lookup('env', 'USER') }}"
+      become: yes
+
+    - name: Create bin directory for brew
+      ansible.builtin.file:
+        path: "/home/{{ homebrew_user }}/.linuxbrew/bin"
         state: directory
-        mode: 0775
-        owner: root
-        group: wheel
-        recurse: yes
+        owner: "{{ lookup('env', 'USER') }}"
+        group: "{{ lookup('env', 'USER') }}"
+
+    - name: Create a symbolic link for brew
+      ansible.builtin.file:
+        src: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew/bin/brew"
+        dest: "/home/{{ homebrew_user }}/.linuxbrew/bin/brew"
+        owner: "{{ lookup('env', 'USER') }}"
+        group: "{{ lookup('env', 'USER') }}"
+        state: link
+
+    - name: Clone Homebrew GitHub repo
+      ansible.builtin.git:
+        repo: "{{ homebrew_git_repo }}"
+        dest: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew"
+        version: "{{ homebrew_release }}"
+      become_user: "{{ lookup('env', 'USER') }}"
       become: yes
 
-    - name: Download Homebrew installation script
-      get_url:
-        url: https://raw.githubusercontent.com/Homebrew/install/master/install
-        dest: /tmp/install
-
-    - name: Install Homebrew
-      shell: /usr/bin/ruby /tmp/install < /dev/null
-
-    - name: Set permissions for /usr/local/* #multiple users
-      file: 
-        path: '{{ item }}'
-        mode: '0775'
-        owner: '{{ username }}'
-        group: wheel
-        recurse: yes
+    - name: Create bin directory for brew
+      ansible.builtin.file:
+        path: "/home/{{ homebrew_user }}/.linuxbrew/bin"
         state: directory
-      become: yes
-      with_items: '{{ homebrew_paths }}'
-      ignore_errors: yes
+        owner: "{{ lookup('env', 'USER') }}"
+        group: "{{ lookup('env', 'USER') }}"
 
-
-    - name: Fix ACL permissions for multiple users
-      become: yes
-      command: 'chmod -R +a "group:admin allow list,add_file,search,delete,add_subdirectory,delete_child,readattr,writeattr,readextattr,writeextattr,readsecurity,file_inherit,directory_inherit" {{ item }}'
-      args:
-        warn: no
-      with_items: '{{ homebrew_paths }}'
-      ignore_errors: yes
-
-
-    - name: Reset the Homebrew Library repo
-      git: 
-        repo=https://github.com/Homebrew/brew.git
-        dest=/usr/local/Homebrew/Library
-        clone=no
-        update=yes
-        force=yes
-
-    - name: Update Homebrew (first try may fail)
-      homebrew: update_homebrew=yes
-      become: no
-      ignore_errors: yes
-
-    - name: Update Homebrew
-      homebrew: update_homebrew=yes
-      become: no
-
-    - name: Install lazygit via Homebrew
-      community.general.homebrew:
-        name: lazygit
-        state: present
-      become: no
+    - name: Create a symbolic link for brew
+      ansible.builtin.file:
+        src: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew/bin/brew"
+        dest: "/home/{{ homebrew_user }}/.linuxbrew/bin/brew"
+        owner: "{{ lookup('env', 'USER') }}"
+        group: "{{ lookup('env', 'USER') }}"
+        state: link
 
     - name: Install NVM
       shell: |
