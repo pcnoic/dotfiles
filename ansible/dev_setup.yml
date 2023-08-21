@@ -1,0 +1,122 @@
+---
+- hosts: localhost
+  become: yes  # to run tasks as sudo
+  tasks:
+    - name: Install AWS CLI
+      apt:
+        name: awscli
+        state: present
+
+    - name: Install Conda
+      block:
+      - name: Download Miniconda
+        become: no
+        get_url:
+          url: https://repo.anaconda.com/miniconda/Miniconda3-py311_23.5.2-0-Linux-x86_64.sh
+          dest: /tmp/install-miniconda.sh
+          mode: 0755
+
+      - name: Run the installer
+        become: yes
+        shell: /bin/bash /tmp/install-miniconda.sh -b -p /home/{{ username }}/miniconda3
+        args:
+          creates: /home/{{ username }}/miniconda3/bin/conda
+        vars:
+          username: "{{ lookup('env', 'USER') }}"
+
+      - name: Add conda to PATH
+        become: yes
+        shell: echo 'export PATH="/home/{{ username }}/miniconda3/bin:$PATH"' >> /home/{{ username }}/.bashrc
+        args:
+          creates: /home/{{ username }}/.bashrc
+        vars:
+          username: "{{ lookup('env', 'USER') }}"
+
+    - name: Install fzf
+      apt:
+        name: fzf
+        state: present
+
+    - name: Make sure Homebrew directories exists
+      file: 
+        path: /usr/local/*
+        state: directory
+        mode: 0775
+        owner: root
+        group: wheel
+        recurse: yes
+      become: yes
+
+    - name: Download Homebrew installation script
+      get_url:
+        url: https://raw.githubusercontent.com/Homebrew/install/master/install
+        dest: /tmp/install
+
+    - name: Install Homebrew
+      shell: /usr/bin/ruby /tmp/install < /dev/null
+
+    - name: Set permissions for /usr/local/* #multiple users
+      file: 
+        path: '{{ item }}'
+        mode: '0775'
+        owner: '{{ username }}'
+        group: wheel
+        recurse: yes
+        state: directory
+      become: yes
+      with_items: '{{ homebrew_paths }}'
+      ignore_errors: yes
+
+
+    - name: Fix ACL permissions for multiple users
+      become: yes
+      command: 'chmod -R +a "group:admin allow list,add_file,search,delete,add_subdirectory,delete_child,readattr,writeattr,readextattr,writeextattr,readsecurity,file_inherit,directory_inherit" {{ item }}'
+      args:
+        warn: no
+      with_items: '{{ homebrew_paths }}'
+      ignore_errors: yes
+
+
+    - name: Reset the Homebrew Library repo
+      git: 
+        repo=https://github.com/Homebrew/brew.git
+        dest=/usr/local/Homebrew/Library
+        clone=no
+        update=yes
+        force=yes
+
+    - name: Update Homebrew (first try may fail)
+      homebrew: update_homebrew=yes
+      become: no
+      ignore_errors: yes
+
+    - name: Update Homebrew
+      homebrew: update_homebrew=yes
+      become: no
+
+    - name: Install lazygit via Homebrew
+      community.general.homebrew:
+        name: lazygit
+        state: present
+      become: no
+
+    - name: Install NVM
+      shell: |
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
+    - name: Install tfenv
+      community.general.homebrew:
+        name: tfenv
+        state: present
+
+    - name: Install oh-my-bash
+      shell: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+      args:
+        warn: no  # This suppresses warnings about using shell instead of a module
+      become: no
+
+    - name: Install ipython
+      apt:
+        name: ipython3
+        state: present
