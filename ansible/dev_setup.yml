@@ -86,7 +86,6 @@
         dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew"
         version: master
       become_user: "{{ lookup('env', 'USER') }}"
-      become: yes
 
     - name: Create bin directory for brew
       ansible.builtin.file:
@@ -94,6 +93,7 @@
         state: directory
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
+      become: no
 
     - name: Create a symbolic link for brew
       ansible.builtin.file:
@@ -102,6 +102,7 @@
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
         state: link
+      become: no
 
     - name: Clone Homebrew GitHub repo
       ansible.builtin.git:
@@ -109,7 +110,6 @@
         dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew"
         version: "{{ homebrew_release }}"
       become_user: "{{ lookup('env', 'USER') }}"
-      become: yes
 
     - name: Create bin directory for brew
       ansible.builtin.file:
@@ -117,6 +117,7 @@
         state: directory
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
+      become: no
 
     - name: Create a symbolic link for brew
       ansible.builtin.file:
@@ -125,6 +126,7 @@
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
         state: link
+      become: no
 
     - name: Install nvm
       community.general.homebrew:
