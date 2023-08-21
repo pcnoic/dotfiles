@@ -126,9 +126,10 @@
         group: "{{ lookup('env', 'USER') }}"
         state: link
 
-    - name: Install NVM
-      shell: |
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+    - name: Install nvm
+      community.general.homebrew:
+        name: nvm
+        state: present
 
     - name: Install tfenv
       community.general.homebrew:
