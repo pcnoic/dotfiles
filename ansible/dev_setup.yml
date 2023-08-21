@@ -83,22 +83,22 @@
     - name: Clone Homebrew GitHub repo
       ansible.builtin.git:
         repo: https://github.com/Homebrew/brew.git
-        dest: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew"
+        dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew"
         version: master
       become_user: "{{ lookup('env', 'USER') }}"
       become: yes
 
     - name: Create bin directory for brew
       ansible.builtin.file:
-        path: "/home/{{ homebrew_user }}/.linuxbrew/bin"
+        path: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
         state: directory
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
 
     - name: Create a symbolic link for brew
       ansible.builtin.file:
-        src: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew/bin/brew"
-        dest: "/home/{{ homebrew_user }}/.linuxbrew/bin/brew"
+        src: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew/bin/brew"
+        dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin/brew"
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
         state: link
@@ -106,22 +106,22 @@
     - name: Clone Homebrew GitHub repo
       ansible.builtin.git:
         repo: "{{ homebrew_git_repo }}"
-        dest: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew"
+        dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew"
         version: "{{ homebrew_release }}"
       become_user: "{{ lookup('env', 'USER') }}"
       become: yes
 
     - name: Create bin directory for brew
       ansible.builtin.file:
-        path: "/home/{{ homebrew_user }}/.linuxbrew/bin"
+        path: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
         state: directory
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
 
     - name: Create a symbolic link for brew
       ansible.builtin.file:
-        src: "/home/{{ homebrew_user }}/.linuxbrew/Homebrew/bin/brew"
-        dest: "/home/{{ homebrew_user }}/.linuxbrew/bin/brew"
+        src: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew/bin/brew"
+        dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin/brew"
         owner: "{{ lookup('env', 'USER') }}"
         group: "{{ lookup('env', 'USER') }}"
         state: link
