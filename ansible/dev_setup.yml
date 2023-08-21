@@ -7,31 +7,6 @@
         name: awscli
         state: present
 
-    - name: Install Conda
-      block:
-      - name: Download Miniconda
-        become: no
-        get_url:
-          url: https://repo.anaconda.com/miniconda/Miniconda3-py311_23.5.2-0-Linux-x86_64.sh
-          dest: /tmp/install-miniconda.sh
-          mode: 0755
-
-      - name: Run the installer
-        become: yes
-        shell: /bin/bash /tmp/install-miniconda.sh -b -p /home/{{ username }}/miniconda3
-        args:
-          creates: /home/{{ username }}/miniconda3/bin/conda
-        vars:
-          username: "{{ lookup('env', 'USER') }}"
-
-      - name: Add conda to PATH
-        become: yes
-        shell: echo 'export PATH="/home/{{ username }}/miniconda3/bin:$PATH"' >> /home/{{ username }}/.bashrc
-        args:
-          creates: /home/{{ username }}/.bashrc
-        vars:
-          username: "{{ lookup('env', 'USER') }}"
-
     - name: Install fzf
       apt:
         name: fzf
