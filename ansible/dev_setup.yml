@@ -168,12 +168,6 @@
         state: present
       become: no
 
-    - name: Install kubens
-      community.general.homebrew:
-        name: kubens
-        state: present
-      become: no
-
     - name: Install k9s
       community.general.homebrew:
         name: k9s
