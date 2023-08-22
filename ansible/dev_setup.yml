@@ -198,6 +198,12 @@
         state: present
       become: no
 
+    - name: Install bitwarden-cli
+      community.general.homebrew:
+        name: bitwarden-cli
+        state: present
+      become: no
+
     - name: Install oh-my-bash
       shell: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
