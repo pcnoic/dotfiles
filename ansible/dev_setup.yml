@@ -45,80 +45,95 @@
       when:
         - ansible_pkg_mgr == "apt" and ansible_os_family == "Debian"
 
-    - name: Clone Homebrew GitHub repo
-      ansible.builtin.git:
-        repo: https://github.com/Homebrew/brew.git
-        dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew"
-        version: master
-      become_user: "{{ lookup('env', 'USER') }}"
+    - block:
+      - name: Install Homebrew on macOS
+        shell: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        args:
+          warn: no
+        become: no
+        tags: homebrew
+        
+      when: ansible_os_family == "Darwin"
 
-    - name: Create bin directory for brew
-      ansible.builtin.file:
-        path: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
-        state: directory
-        owner: "{{ lookup('env', 'USER') }}"
-        group: "{{ lookup('env', 'USER') }}"
-      become: no
 
-    - name: Create a symbolic link for brew
-      ansible.builtin.file:
-        src: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew/bin/brew"
-        dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin/brew"
-        owner: "{{ lookup('env', 'USER') }}"
-        group: "{{ lookup('env', 'USER') }}"
-        state: link
-      become: no
+    - block:
+      - name: Clone Homebrew GitHub repo
+        ansible.builtin.git:
+          repo: https://github.com/Homebrew/brew.git
+          dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew"
+          version: master
+        become_user: "{{ lookup('env', 'USER') }}"
 
-    - name: Get the user shell
-      shell: |
-        set -o pipefail
-        egrep "^{{ lookup('env', 'USER') }}:" /etc/passwd | awk -F: '{ print $7 }' | awk -F/ '{print $3}'
-      args:
-        executable: /bin/bash
-      changed_when: false
-      register: user_shell
-      become: no
+      - name: Create bin directory for brew
+        ansible.builtin.file:
+          path: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
+          state: directory
+          owner: "{{ lookup('env', 'USER') }}"
+          group: "{{ lookup('env', 'USER') }}"
+        become: no
 
-    - name: Add homebrew path to system-wide $PATH for bash shell (Debian OS Family).
-      ansible.builtin.lineinfile:
-        path: "/home/{{ lookup('env', 'USER') }}/.profile"
-        line: "PATH=$PATH:~/.linuxbrew/bin"
-        owner: "{{ lookup('env', 'USER') }}"
-        mode: 0644
-        create: yes
-      when: 
-        - user_shell.stdout == "bash" and ansible_os_family == "Debian"
-      become: no
+      - name: Create a symbolic link for brew
+        ansible.builtin.file:
+          src: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/Homebrew/bin/brew"
+          dest: "/home/{{ lookup('env', 'USER') }}/.linuxbrew/bin/brew"
+          owner: "{{ lookup('env', 'USER') }}"
+          group: "{{ lookup('env', 'USER') }}"
+          state: link
+        become: no
 
-    - name: Add homebrew path to system-wide $PATH for bash shell (RedHat OS Family).
-      ansible.builtin.lineinfile:
-        path: "/home/{{ lookup('env', 'USER') }}/.bash_profile"
-        line: "PATH=$PATH:~/.linuxbrew/bin"
-        owner: "{{ lookup('env', 'USER') }}"
-        mode: 0644
-        create: yes
-      when: 
-        - user_shell.stdout == "bash" and ansible_os_family == "RedHat"
-      become: no
+      - name: Get the user shell
+        shell: |
+          set -o pipefail
+          egrep "^{{ lookup('env', 'USER') }}:" /etc/passwd | awk -F: '{ print $7 }' | awk -F/ '{print $3}'
+        args:
+          executable: /bin/bash
+        changed_when: false
+        register: user_shell
+        become: no
 
-    - name: Add homebrew path to system-wide $PATH for fish shell.
-      ansible.builtin.copy:
-        dest: "/home/{{ lookup('env', 'USER') }}/.config/fish/conf.d/brew.fish"
-        content: "set -gx PATH $PATH /home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
-        owner: "{{ lookup('env', 'USER') }}"
-        mode: 0644
-      when: user_shell.stdout == "fish"
-      become: no
+      - name: Add homebrew path to system-wide $PATH for bash shell (Debian OS Family).
+        ansible.builtin.lineinfile:
+          path: "/home/{{ lookup('env', 'USER') }}/.profile"
+          line: "PATH=$PATH:~/.linuxbrew/bin"
+          owner: "{{ lookup('env', 'USER') }}"
+          mode: 0644
+          create: yes
+        when: 
+          - user_shell.stdout == "bash" and ansible_os_family == "Debian"
+        become: no
 
-    - name: Add homebrew path to system-wide $PATH for zsh shell.
-      ansible.builtin.lineinfile:
-        path: "/home/{{ lookup('env', 'USER') }}/.zprofile"
-        line: "PATH=$PATH:~/.linuxbrew/bin"
-        owner: "{{ lookup('env', 'USER') }}"
-        mode: 0644
-        create: yes
-      when: user_shell.stdout == "zsh"
-      become: no
+      - name: Add homebrew path to system-wide $PATH for bash shell (RedHat OS Family).
+        ansible.builtin.lineinfile:
+          path: "/home/{{ lookup('env', 'USER') }}/.bash_profile"
+          line: "PATH=$PATH:~/.linuxbrew/bin"
+          owner: "{{ lookup('env', 'USER') }}"
+          mode: 0644
+          create: yes
+        when: 
+          - user_shell.stdout == "bash" and ansible_os_family == "RedHat"
+        become: no
+
+      - name: Add homebrew path to system-wide $PATH for fish shell.
+        ansible.builtin.copy:
+          dest: "/home/{{ lookup('env', 'USER') }}/.config/fish/conf.d/brew.fish"
+          content: "set -gx PATH $PATH /home/{{ lookup('env', 'USER') }}/.linuxbrew/bin"
+          owner: "{{ lookup('env', 'USER') }}"
+          mode: 0644
+        when: user_shell.stdout == "fish"
+        become: no
+
+      - name: Add homebrew path to system-wide $PATH for zsh shell.
+        ansible.builtin.lineinfile:
+          path: "/home/{{ lookup('env', 'USER') }}/.zprofile"
+          line: "PATH=$PATH:~/.linuxbrew/bin"
+          owner: "{{ lookup('env', 'USER') }}"
+          mode: 0644
+          create: yes
+        when: user_shell.stdout == "zsh"
+        become: no
+
+      when: ansible_os_family == "Debian" or ansible_os_family == "RedHat"
 
     - name: Install gcc
       community.general.homebrew:
