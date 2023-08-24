@@ -146,7 +146,7 @@
         when: user_shell.stdout == "zsh"
         become: no
 
-      when: ansible_os_family == "Debian" or ansible_os_family == "RedHat"
+      when: ansible_os_family == "Debian" or ansible_os_family == "RedHat" or ansible_os_family == "Suse"
 
     - name: Install gcc
       community.general.homebrew:
