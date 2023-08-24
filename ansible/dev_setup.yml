@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  become: yes  # to run tasks as sudo
+  become: yes
   tasks:
     - block:
       - name: Install the 'Development tools' package group
@@ -46,11 +46,6 @@
         - ansible_pkg_mgr == "apt" and ansible_os_family == "Debian"
 
     - block:
-      - name: Install the 'Development tools' package group using zypper
-        ansible.builtin.zypper:
-          name: "devel_basis"
-          state: present
-
       - name: Install prereq rpm packages using zypper
         ansible.builtin.zypper:
           name: "{{ packages }}"
@@ -241,7 +236,7 @@
       shell: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
       args:
-        warn: no  # This suppresses warnings about using shell instead of a module
+        warn: no
       become: no
       when:
         - user_shell.stdout == "bash" and ansible_os_family == "Debian"
@@ -250,7 +245,7 @@
       shell: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
       args:
-        warn: no  # This suppresses warnings about using shell instead of a module
+        warn: no
       become: no
       when:
         - user_shell.stdout == "zsh" and ansible_os_family == "Darwin"
