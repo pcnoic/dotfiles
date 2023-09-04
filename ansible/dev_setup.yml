@@ -101,6 +101,11 @@
         state: present
       become: no
 
+    - name: Post-install fzf
+      ansible.builtin.shell:
+        cmd: $(brew --prefix)/opt/fzf/install
+      become: no
+
     - name: Install awscli
       community.general.homebrew:
         name: awscli
@@ -143,23 +148,11 @@
         state: present
       become: no
 
-    - name: Install oh-my-bash
-      ansible.builtin.shell:
-        cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+    - name: Install flyctl
+      community.general.homebrew:
+        name: flyctl
+        state: present
       become: no
-      when: 
-        - user_shell == "/bin/bash" 
-        - ansible_os_family == "Debian"
-      ignore_errors: true
-
-    - name: Install oh-my-zsh
-      ansible.builtin.shell:
-        cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-      become: no
-      when:
-        - user_shell == "/bin/zsh"
-        - ansible_os_family == "Darwin"
-      ignore_errors: true
 
     - name: Add aliases to .bashrc
       ansible.builtin.lineinfile:
