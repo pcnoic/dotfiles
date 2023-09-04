@@ -89,6 +89,18 @@
       args:
         creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
 
+    - name: Add NVM configurations to shell rc file
+      ansible.builtin.lineinfile:
+        path: "/home/{{ ansible_user }}/{{ shell_rc_file }}"
+        line: "{{ item }}"
+        create: yes
+      loop:
+        - 'export NVM_DIR="$HOME/.nvm"'
+        - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm'
+        - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion'
+      vars:
+        shell_rc_file: "{% if user_shell == '/bin/bash' %}.bashrc{% elif user_shell == '/usr/bin/zsh' %}.zshrc{% endif %}"
+
     - name: Install tfenv
       community.general.homebrew:
         name: tfenv
