@@ -2,6 +2,24 @@
 - hosts: localhost
   become: yes
   tasks:
+    - name: Get logged-in username from environment variables
+      shell: echo $USER
+      register: current_user
+      changed_when: false
+
+    - name: Set ansible_user variable
+      set_fact:
+        ansible_user: "{{ current_user.stdout }}"
+
+    - name: Get the user shell
+      shell: "getent passwd {{ ansible_user }} | awk -F: '{ print $7 }'"
+      register: user_shell_result
+      changed_when: false
+
+    - name: Set user_shell variable
+      set_fact:
+        user_shell: "{{ user_shell_result.stdout }}"
+
     - block:
       - name: Install the 'Development tools' package group
         ansible.builtin.yum:
@@ -126,23 +144,23 @@
       become: no
 
     - name: Install oh-my-bash
-      shell: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
-      args:
-        warn: no
+      ansible.builtin.shell:
+        cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
       become: no
-      when:
-        - user_shell.stdout == "bash" and ansible_os_family == "Debian"
+      when: 
+        - user_shell == "/bin/bash" 
+        - ansible_os_family == "Debian"
+      ignore_errors: true
 
     - name: Install oh-my-zsh
-      shell: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-      args:
-        warn: no
+      ansible.builtin.shell:
+        cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
       become: no
       when:
-        - user_shell.stdout == "zsh" and ansible_os_family == "Darwin"
-    
+        - user_shell == "/bin/zsh"
+        - ansible_os_family == "Darwin"
+      ignore_errors: true
+
     - name: Add aliases to .bashrc
       ansible.builtin.lineinfile:
         path: "/home/{{ ansible_user }}/.bashrc"
@@ -153,7 +171,7 @@
         - "alias lg='lazygit'"
         - "alias k='kubectl'"
         - "alias kx='kubectx'"
-      when: user_shell.stdout == "bash"
+      when: user_shell == "/bin/bash"
 
     - name: Add aliases to .zshrc
       ansible.builtin.lineinfile:
@@ -165,4 +183,4 @@
         - "alias lg='lazygit'"
         - "alias k='kubectl'"
         - "alias kx='kubectx'"
-      when: user_shell.stdout == "zsh"
+      when: user_shell == "/bin/zsh"
