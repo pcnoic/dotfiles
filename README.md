@@ -1,4 +1,4 @@
-# Dotfiles and Development Environment Provisioning
+# Dotfiles
 
 This repository contains my personal dotfiles and an Ansible-based setup for quickly provisioning new development environments. It's designed to automate the process of setting up a new machine with my preferred tools, configurations, and aliases.
 
