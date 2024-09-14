@@ -31,7 +31,7 @@
     - role: ../roles/linux
     - role: darkwizard242.lazygit
       when: is_linux == 'true' 
-    - role: taktus.fzf
+    - role: dotstrap.fzf
       when: is_linux == 'true'
       become: yes
     - role: ../roles/macos
