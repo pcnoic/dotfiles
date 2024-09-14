@@ -15,6 +15,7 @@
       - gcc
       - fzf
       - yq
+      - micro
     state: present
   when: is_macos == 'true'
 

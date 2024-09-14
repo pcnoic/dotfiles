@@ -8,6 +8,7 @@
       - fzf
       - yq
       - snapd
+      - micro
     state: present
   when: is_linux == 'true'
 
