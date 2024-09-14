@@ -33,6 +33,7 @@
       when: is_linux == 'true' 
     - role: pandemonium1986.k9s
       when: is_linux == 'true'
+      become: yes
     - role: thiagoalmeidasa.awscli
       when: is_linux == 'true'
     - role: ../roles/macos
