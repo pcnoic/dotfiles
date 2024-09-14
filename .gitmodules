@@ -1,0 +1,3 @@
+[submodule "ansible/roles/confidential"]
+	path = ansible/roles/confidential
+	url = git@github.com:pcnoic/confidential.git
