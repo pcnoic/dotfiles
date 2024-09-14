@@ -21,25 +21,3 @@
     create: yes
   when: is_linux == 'true'
 
-- name: Install AWS CLI
-  pip:
-    name: awscli
-    state: present
-  when: is_linux == 'true'
-
-- name: Install Google Cloud SDK
-  block:
-    - name: Add Google Cloud SDK repository
-      get_url:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        dest: /usr/share/keyrings/cloud.google.gpg
-    - name: Add Google Cloud SDK repository
-      apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main"
-        state: present
-    - name: Install Google Cloud SDK
-      apt:
-        name: google-cloud-sdk
-        state: present
-        update_cache: yes
-  when: is_linux == 'true'
