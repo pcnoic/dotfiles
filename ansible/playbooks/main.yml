@@ -29,4 +29,6 @@
   roles:
     - role: ../roles/common
     - role: ../roles/linux
+    - role: darkwizard242.lazygit
+      when: is_linux == 'true' 
     - role: ../roles/macos

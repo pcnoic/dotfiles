@@ -100,6 +100,9 @@ install-homebrew:
 		echo "Homebrew is already installed."; \
 	fi
 
+install-ansible-dependencies:
+	ansible-galaxy install darkwizard242.lazygit
+
 run-ansible:
 	cd ansible && ansible-playbook -i inventory/localhost \
 		-e "detected_os=$(DETECTED_OS)" \
