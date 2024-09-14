@@ -102,7 +102,6 @@ install-homebrew:
 
 install-ansible-dependencies:
 	ansible-galaxy install darkwizard242.lazygit
-	ansible-galaxy install dotstrap.fzf
 
 run-ansible:
 	cd ansible && ansible-playbook -i inventory/localhost \
