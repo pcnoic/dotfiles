@@ -15,7 +15,7 @@
   when: is_linux == 'true'
 
 - name: Add fzf to shell
-  shell: echo 'eval "$(fzf --bash)"' >> ~/.bashrc
+  shell: echo 'eval "$(fzf --bash)"' >> {{ ansible_env.HOME }}/.bashrc
   become: yes
   when: is_linux == 'true'
 
