@@ -103,7 +103,7 @@ install-homebrew:
 install-ansible-dependencies:
 	ansible-galaxy install thiagoalmeidasa.awscli
 	ansible-galaxy install darkwizard242.lazygit
-	ansible-galaxy install andrewrothstein.k9s
+	ansible-galaxy install pandemonium1986.k9s
 
 run-ansible:
 	cd ansible && ansible-playbook -i inventory/localhost \

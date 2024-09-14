@@ -31,7 +31,7 @@
     - role: ../roles/linux
     - role: darkwizard242.lazygit
       when: is_linux == 'true' 
-    - role: andrewrothstein.k9s
+    - role: pandemonium1986.k9s
       when: is_linux == 'true'
     - role: thiagoalmeidasa.awscli
       when: is_linux == 'true'
