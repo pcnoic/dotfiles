@@ -101,7 +101,7 @@ install-homebrew:
 	fi
 
 install-ansible-dependencies:
-	ansible-galaxy install tommarshall.awscli
+	ansible-galaxy install thiagoalmeidasa.awscli
 	ansible-galaxy install darkwizard242.lazygit
 	ansible-galaxy install andrewrothstein.k9s
 
