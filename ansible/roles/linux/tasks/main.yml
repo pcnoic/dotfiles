@@ -13,13 +13,6 @@
   become: yes
   when: is_linux == 'true'
 
-- name: Install tfenv
-  git:
-    repo:
-      - https://github.com/tfutils/tfenv.git
-    dest: "{{ ansible_env.HOME }}/.tfenv"
-  when: is_linux == 'true'
-
 - name: Add tfenv to PATH
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
