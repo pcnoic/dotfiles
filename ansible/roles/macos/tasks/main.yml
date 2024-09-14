@@ -1,0 +1,34 @@
+---
+- name: Install macOS-specific tools with Homebrew
+  homebrew:
+    name:
+      - kubectx
+      - awscli
+      - google-cloud-sdk
+      - tree
+      - watch
+      - jq
+      - kubectl
+      - k9s
+      - lazygit
+      - gh
+      - gcc
+      - fzf
+      - yq
+      - micro
+    state: present
+  when: is_macos == 'true'
+
+- name: Install Orbstack
+  homebrew_cask:
+    name: orbstack
+    state: present
+  when: is_macos == 'true'
+  ignore_errors: yes
+
+- name: Install Visual Studio Code
+  homebrew_cask:
+    name: visual-studio-code
+    state: present
+  when: is_macos == 'true'
+  ignore_errors: yes
