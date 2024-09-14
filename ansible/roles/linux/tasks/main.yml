@@ -13,12 +13,6 @@
   become: yes
   when: is_linux == 'true'
 
-- name: Install k9s with snap
-  snap:
-    name: k9s
-    state: present
-  when: is_linux == 'true'
-
 - name: Install tfenv
   git:
     repo:
