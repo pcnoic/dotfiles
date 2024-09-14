@@ -14,6 +14,14 @@
   become: yes
   when: is_linux == 'true'
 
+- name: Install aws-cli with Snap classic
+  snap:
+    name: aws-cli
+    classic: true
+    state: present
+  become: yes
+  when: is_linux == 'true'
+
 - name: Add tfenv to PATH
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
