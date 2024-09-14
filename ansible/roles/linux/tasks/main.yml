@@ -1,0 +1,41 @@
+---
+- name: Install Linux-specific tools
+  package:
+    name:
+      - kubectx
+    state: present
+  when: is_linux == 'true'
+
+- name: Install AWS CLI
+  pip:
+    name: awscli
+    state: present
+  when: is_linux == 'true'
+
+- name: Install Google Cloud SDK
+  block:
+    - name: Add Google Cloud SDK repository
+      get_url:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        dest: /usr/share/keyrings/cloud.google.gpg
+    - name: Add Google Cloud SDK repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main"
+        state: present
+    - name: Install Google Cloud SDK
+      apt:
+        name: google-cloud-sdk
+        state: present
+        update_cache: yes
+  when: is_linux == 'true'
+
+- name: Install Visual Studio Code
+  block:
+    - name: Download VS Code .deb package
+      get_url:
+        url: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+        dest: /tmp/vscode.deb
+    - name: Install VS Code
+      apt:
+        deb: /tmp/vscode.deb
+  when: is_linux == 'true'

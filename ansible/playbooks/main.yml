@@ -1,0 +1,32 @@
+---
+- name: Setup development environment
+  hosts: localhost
+  connection: local
+  vars:
+    ansible_os_family: "{{ detected_os }}"
+    is_macos: "{{ detected_os == 'macOS' }}"
+    is_linux: "{{ detected_os == 'Linux' }}"
+    linux_distro: "{{ detected_distro | default('Unknown') }}"
+
+  pre_tasks:
+    - name: Gather facts
+      setup:
+      become: no
+
+    - name: Update package cache (Linux)
+      package:
+        update_cache: yes
+      when: is_linux == 'true'
+      become: yes
+      ignore_errors: yes
+
+    - name: Update Homebrew (macOS)
+      homebrew:
+        update_homebrew: yes
+      when: is_macos == 'true'
+      become: no
+
+  roles:
+    - role: ../roles/common
+    - role: ../roles/linux
+    - role: ../roles/macos
