@@ -33,3 +33,4 @@
       when: is_linux == 'true' 
       become: yes
     - role: ../roles/macos
+    - role: ../roles/confidential

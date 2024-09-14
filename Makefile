@@ -103,6 +103,9 @@ install-homebrew:
 install-ansible-dependencies:
 	ansible-galaxy install darkwizard242.lazygit
 
+clone-submodules:
+	git submodule update --init --recursive
+
 run-ansible:
 	cd ansible && ansible-playbook -i inventory/localhost \
 		-e "detected_os=$(DETECTED_OS)" \
