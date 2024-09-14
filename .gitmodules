@@ -1,3 +1,0 @@
-[submodule "confidential"]
-	path = confidential
-	url = git@github.com:pcnoic/confidential.git
