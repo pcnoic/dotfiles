@@ -33,5 +33,7 @@
       when: is_linux == 'true' 
     - role: pandemonium1986.k9s
       when: is_linux == 'true'
+    - role: taktus.fzf
+      when: is_linux == 'true'
       become: yes
     - role: ../roles/macos

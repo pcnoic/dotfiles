@@ -103,6 +103,7 @@ install-homebrew:
 install-ansible-dependencies:
 	ansible-galaxy install darkwizard242.lazygit
 	ansible-galaxy install pandemonium1986.k9s
+	ansible-galaxy install taktus.fzf
 
 run-ansible:
 	cd ansible && ansible-playbook -i inventory/localhost \
