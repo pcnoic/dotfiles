@@ -47,7 +47,7 @@ To use this tool to set up a new development environment:
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/dotfiles.git
+   git clone https://github.com/pcnoic/dotfiles.git
    cd dotfiles
    ```
 
