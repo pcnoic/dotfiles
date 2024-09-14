@@ -1,9 +1,36 @@
 ---
-- name: Install Linux-specific tools
+- name: Install tools
   package:
     name:
       - kubectx
+      - lazygit
+      - gh
+      - jq
+      - fzf
+      - yq
+      - snapd
     state: present
+  when: is_linux == 'true'
+
+- name: Install k9s with snap
+  snap:
+    name: k9s
+    state: present
+  when: is_linux == 'true'
+
+- name: Install tfenv
+  git:
+    repo:
+      - https://github.com/tfutils/tfenv.git
+    dest: "{{ ansible_env.HOME }}/.tfenv"
+  when: is_linux == 'true'
+
+- name: Add tfenv to PATH
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'export PATH="$PATH:{{ ansible_env.HOME }}/.tfenv/bin"'
+    state: present
+    create: yes
   when: is_linux == 'true'
 
 - name: Install AWS CLI
@@ -27,15 +54,4 @@
         name: google-cloud-sdk
         state: present
         update_cache: yes
-  when: is_linux == 'true'
-
-- name: Install Visual Studio Code
-  block:
-    - name: Download VS Code .deb package
-      get_url:
-        url: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
-        dest: /tmp/vscode.deb
-    - name: Install VS Code
-      apt:
-        deb: /tmp/vscode.deb
   when: is_linux == 'true'
