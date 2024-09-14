@@ -14,6 +14,11 @@
   become: yes
   when: is_linux == 'true'
 
+- name: Add fzf to shell
+  shell: echo 'eval "$(fzf --bash)"' >> ~/.bashrc
+  become: yes
+  when: is_linux == 'true'
+
 - name: Install aws-cli with Snap classic
   snap:
     name: aws-cli
