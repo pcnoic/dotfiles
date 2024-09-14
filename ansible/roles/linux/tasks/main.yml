@@ -9,6 +9,7 @@
       - yq
       - snapd
       - micro
+      - python3-pip
     state: present
   become: yes
   when: is_linux == 'true'
