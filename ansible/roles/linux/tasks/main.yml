@@ -10,6 +10,7 @@
       - snapd
       - micro
     state: present
+  become: yes
   when: is_linux == 'true'
 
 - name: Install LazyGit (Linux)
