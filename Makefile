@@ -40,7 +40,7 @@ endif
 
 all: install
 
-install: detect-os install-ansible run-ansible
+install: detect-os install-ansible install-ansible-dependencies run-ansible
 
 detect-os:
 	@echo "Detected OS: $(DETECTED_OS)"
