@@ -157,3 +157,17 @@
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: '[ -f ~/.bash_aliases ] && source ~/.bash_aliases'
   when: is_linux == 'true'
+
+- name: Set editor to micro (Linux)
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    block: |
+      export EDITOR=micro
+  when: is_linux == 'true'
+
+- name: Set editor to micro (macOS)
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    block: |
+      export EDITOR=micro
+  when: is_macos == 'true'
