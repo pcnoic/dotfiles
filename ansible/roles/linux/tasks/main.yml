@@ -10,6 +10,7 @@
       - micro
       - python3-pip
       - dnsutils
+      - fzf
     state: present
   become: yes
   when: is_linux == 'true'
@@ -30,3 +31,8 @@
     create: yes
   when: is_linux == 'true'
 
+- name: Configure fzf key bindings
+  shell: |
+    echo '[ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash' >> "{{ ansible_env.HOME }}/.bashrc"
+    echo '[ -f /usr/share/bash-completion/completions/fzf ] && source /usr/share/bash-completion/completions/fzf' >> "{{ ansible_env.HOME }}/.bashrc"
+  when: is_linux == 'true'
