@@ -9,6 +9,7 @@
       - snapd
       - micro
       - python3-pip
+      - dnsutils
     state: present
   become: yes
   when: is_linux == 'true'
