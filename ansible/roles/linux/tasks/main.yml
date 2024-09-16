@@ -23,6 +23,7 @@
       - dnsutils
       - fzf
       - aws-cli
+      - google-cloud-cli
     state: present
     extra_args: --noconfirm
   become: yes
