@@ -1,27 +1,36 @@
 ---
-- name: Install tools
-  package:
-    name:
-      - kubectx
-      - gh
-      - jq
-      - yq
-      - snapd
-      - micro
-      - python3-pip
-      - dnsutils
-      - fzf
-    state: present
+- name: Update package database
+  pacman:
+    update_cache: yes
   become: yes
   when: is_linux == 'true'
 
-- name: Install aws-cli with Snap classic
-  snap:
-    name: aws-cli
-    classic: true
-    state: present
+- name: Update mirrorlist
+  lineinfile:
+    path: /etc/pacman.d/mirrorlist
+    line: "Server = http://mirror.rackspace.com/archlinux/$repo/os/$arch"
+    insertbefore: BOF
   become: yes
   when: is_linux == 'true'
+
+- name: Install tools
+  pacman:
+    name:
+      - kubectx
+      - jq
+      - yq
+      - micro
+      - dnsutils
+      - fzf
+      - aws-cli
+    state: present
+    extra_args: --noconfirm
+  become: yes
+  when: is_linux == 'true'
+  register: package_install
+  retries: 3
+  delay: 5
+  until: package_install is success
 
 - name: Add tfenv to PATH
   lineinfile:

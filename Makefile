@@ -58,16 +58,13 @@ install-ansible: detect-os
 			;; \
 		Linux) \
 			case "$(DISTRO)" in \
-				Ubuntu|Debian) \
-					echo "Installing Ansible on $(DISTRO)..."; \
-					sudo apt update; \
-					sudo apt install -y software-properties-common; \
-					sudo apt-add-repository --yes --update ppa:ansible/ansible; \
-					sudo apt install -y ansible; \
+				archarm) \
+					echo "Installing Ansible on Arch Linux..."; \
+					sudo pacman -Sy --noconfirm ansible; \
 					;; \
-				Fedora) \
-					echo "Installing Ansible on Fedora..."; \
-					sudo dnf install -y ansible; \
+				arch) \
+					echo "Installing Ansible on Arch Linux..."; \
+					sudo pacman -Sy --noconfirm ansible; \
 					;; \
 				*) \
 					echo "Unsupported Linux distribution for Ansible installation: $(DISTRO)"; \
